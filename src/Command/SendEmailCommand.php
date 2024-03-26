@@ -8,6 +8,7 @@ use Cake\Command\Command;
 use Cake\Console\Arguments;
 use Cake\Console\ConsoleIo;
 use Cake\Console\ConsoleOptionParser;
+use Cake\Core\Exception\CakeException;
 use Cake\Mailer\Mailer;
 use Cake\Mailer\Message;
 use Cake\Mailer\Transport\MailTransport;
@@ -59,7 +60,11 @@ class SendEmailCommand extends Command
 
         $message->setFrom('jmcd1973@gmail.com', 'James 1973 Gmail');
 
-        dd($this->messageAsString($message));
+        $this->messageAsString($message);
+
+        dd(
+            $this->_content
+        );
 
         // new Google_Service
 
@@ -72,9 +77,10 @@ class SendEmailCommand extends Command
         // $mailer->deliver('Hi James Test');
     }
 
-
     protected function messageAsString(Message $message): string
     {
+        $this->checkRecipient($message);
+
         $headers = $message->getHeadersString([
             'from',
             'sender',
@@ -88,8 +94,9 @@ class SendEmailCommand extends Command
 
         $message = $this->_prepareMessage($message);
 
-        return $headers . "\r\n\r\n" . $message . "\r\n\r\n\r\n.";
         $this->_content = ['headers' => $headers, 'message' => $message];
+
+        return $headers . "\r\n\r\n" . $message . "\r\n\r\n\r\n.";
     }
 
     protected function _prepareMessage(Message $message): string
@@ -107,5 +114,19 @@ class SendEmailCommand extends Command
         }
 
         return implode("\r\n", $messages);
+    }
+
+    protected function checkRecipient(Message $message): void
+    {
+        if (
+            $message->getTo() === []
+            && $message->getCc() === []
+            && $message->getBcc() === []
+        ) {
+            throw new CakeException(
+                'You must specify at least one recipient.'
+                    . ' Use one of `setTo`, `setCc` or `setBcc` to define a recipient.'
+            );
+        }
     }
 }
