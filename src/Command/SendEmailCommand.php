@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace App\Command;
@@ -7,12 +8,18 @@ use Cake\Command\Command;
 use Cake\Console\Arguments;
 use Cake\Console\ConsoleIo;
 use Cake\Console\ConsoleOptionParser;
+use Cake\Mailer\Mailer;
+use Cake\Mailer\Message;
+use Cake\Mailer\Transport\MailTransport;
+use Google_Service;
 
 /**
  * SendEmail command.
  */
 class SendEmailCommand extends Command
 {
+
+    protected array $_content = [];
     /**
      * Hook method for defining this command's option parser.
      *
@@ -36,5 +43,69 @@ class SendEmailCommand extends Command
      */
     public function execute(Arguments $args, ConsoleIo $io)
     {
+        // $mailer = new Mailer();
+
+        $message = new Message();
+
+        // $message->setTransferEncoding('base64');
+
+        $message->addTo('james@toggen.com.au', 'James McDonald');
+
+        $message->setBodyHtml('<h1>Hi James</h1><p>Test para</p>');
+
+        $message->setBodyText("Hi James\n\nTest para");
+
+        $message->setEmailFormat('both');
+
+        $message->setFrom('jmcd1973@gmail.com', 'James 1973 Gmail');
+
+        dd($this->messageAsString($message));
+
+        // new Google_Service
+
+        // $mailer->setTransport('gmail');
+
+        // $mailer->setTo('james@toggen.com.au', 'James Toggen');
+
+        // $mailer->setFrom('jmcd1973@gmail.com', 'James Gmail');
+
+        // $mailer->deliver('Hi James Test');
+    }
+
+
+    protected function messageAsString(Message $message): string
+    {
+        $headers = $message->getHeadersString([
+            'from',
+            'sender',
+            'replyTo',
+            'readReceipt',
+            'to',
+            'cc',
+            'subject',
+            'returnPath',
+        ]);
+
+        $message = $this->_prepareMessage($message);
+
+        return $headers . "\r\n\r\n" . $message . "\r\n\r\n\r\n.";
+        $this->_content = ['headers' => $headers, 'message' => $message];
+    }
+
+    protected function _prepareMessage(Message $message): string
+    {
+        $lines = $message->getBody();
+
+        $messages = [];
+
+        foreach ($lines as $line) {
+            if (str_starts_with($line, '.')) {
+                $messages[] = '.' . $line;
+            } else {
+                $messages[] = $line;
+            }
+        }
+
+        return implode("\r\n", $messages);
     }
 }
