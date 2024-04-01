@@ -215,12 +215,12 @@ return [
      */
     'EmailTransport' => [
         'default' => [
-            'className' => MailTransport::class,
+            'className' => SmtpTransport::class,
             /*
              * The keys host, port, timeout, username, password, client and tls
              * are used in SMTP transports
              */
-            'host' => 'localhost',
+            'host' => 'toggen-com-au.mail.protection.outlook.com',
             'port' => 25,
             'timeout' => 30,
             /*
@@ -341,6 +341,7 @@ return [
      * Configures logging options
      */
     'Log' => [
+
         'debug' => [
             'className' => FileLog::class,
             'path' => LOGS,

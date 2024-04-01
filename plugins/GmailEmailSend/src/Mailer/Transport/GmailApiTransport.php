@@ -1,18 +1,43 @@
 <?php
+
 declare(strict_types=1);
 
-namespace App\Mailer\Transport;
+namespace GmailEmailSend\Mailer\Transport;
 
+use BadMethodCallException;
+use Cake\Core\Configure;
 use Cake\Core\Exception\CakeException;
+use Cake\Datasource\Exception\RecordNotFoundException;
 use Cake\Mailer\Message;
 use Cake\Mailer\Transport\SmtpTransport;
+use Cake\ORM\Locator\LocatorAwareTrait;
+use Cake\Utility\Security;
 use Exception;
+use GmailEmailSend\Model\Table\GmailAuthTable;
 use Google\Client;
 use Google\Service\Gmail;
 use Google\Service\Gmail\Message as GmailMessage;
+use InvalidArgumentException;
 
 class GmailApiTransport extends SmtpTransport
 {
+    use LocatorAwareTrait;
+
+    public string $gmailUser;
+
+    public GmailAuthTable $table;
+
+    protected array $_defaultConfig = [
+        'username' => 'jmcd1973@gmail.com'
+    ];
+
+    public function __construct($config = [])
+    {
+
+        $this->gmailUser = $this->getConfig('username');
+
+        $this->table = $this->fetchTable('GmailEmailSend.GmailAuth');
+    }
     public function send(Message $message): array
     {
         $strMessage = $this->messageAsString($message);
@@ -21,55 +46,50 @@ class GmailApiTransport extends SmtpTransport
 
         $gmailMessage->setRaw(base64_encode($strMessage));
 
-        $client = $this->getSendClient();
+        $client = $this->getClient();
 
         $service = new Gmail($client);
 
-        $user = 'me'; // the authenticated user
-
-        $results = $service->users_messages->send($user, $gmailMessage);
+        $results = $service->users_messages->send($this->gmailUser, $gmailMessage);
 
         return [
-            'message' => $results,
-            'headers' => $message->getHeaders(),
+            'message' => $message->getBodyString(),
+            'headers' => $message->getHeadersString(),
         ];
     }
 
-    protected function getSendClient()
+    protected function getToken(): array
     {
-        $client = new Client();
+        $user = $this->getUser();
 
-        $tokenPath = $this->getTokenPath();
-
-        if (file_exists($tokenPath)) {
-            $accessToken = json_decode(file_get_contents($tokenPath), true);
-
-            $client->setAccessToken($accessToken);
-        }
-
-        // $client->revokeToken();
-
-        if ($client->isAccessTokenExpired()) {
-            $this->getClient();
-        }
-
-        return $client;
+        return $this->decrypt($user->token);
     }
 
-    protected function getTokenPath(): string
+    protected function decrypt($encrypted): array
     {
-        return ROOT . DS . 'token.json';
+        $result = json_decode(
+            Security::decrypt(
+                stream_get_contents($encrypted),
+                Configure::read('Security.CLIENT_SECRET_KEY')
+            ),
+            true
+        );
+
+        return $result;
     }
 
-    protected function getCredentials(): string
+    protected function getUser()
     {
-        $credentials = ROOT . DS . 'client_secret_59505482608-rjgil11sumb3k1hv2esmal4jp6p2e5jj.apps.googleusercontent.com.json';
+        return $this->table->find()
+            ->where(['email' => $this->gmailUser])
+            ->firstOrFail();
+    }
 
-        if (!file_exists($credentials)) {
-            throw new Exception('Google Credential JSON missing');
-        }
+    protected function getCredentials(): array
+    {
+        $user = $this->getUser();
 
-        return $credentials;
+        return $this->decrypt($user->credentials);
     }
 
     protected function getClient()
@@ -90,12 +110,10 @@ class GmailApiTransport extends SmtpTransport
 
         $client->setPrompt('select_account consent');
 
-        $tokenPath = $this->getTokenPath();
+        $token = $this->getToken();
 
-        if (file_exists($tokenPath)) {
-            $accessToken = json_decode(file_get_contents($tokenPath), true);
-
-            $client->setAccessToken($accessToken);
+        if ($token) {
+            $client->setAccessToken($token);
         }
 
         if ($client->isAccessTokenExpired()) {
@@ -111,6 +129,7 @@ class GmailApiTransport extends SmtpTransport
 
                 // Exchange authorization code for an access token.
                 $accessToken = $client->fetchAccessTokenWithAuthCode($authCode);
+
                 $client->setAccessToken($accessToken);
 
                 // Check to see if there was an error.

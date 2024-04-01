@@ -51,5 +51,8 @@ nbproject/*
 # yarn
 yarn-debug.log
 yarn-error.log
+
+# test creds
 client_secret*.json
 token.json
+client_secret*.json
