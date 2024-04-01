@@ -2,7 +2,7 @@
     "repositories": [
         {
             "type": "vcs",
-            "url": "https://github.com/toggenation/cakephp5-xoauth2"
+            "url": "https://github.com/toggenation/gmail-email-send"
         }
     ],
     "name": "cakephp/app",
@@ -16,7 +16,7 @@
         "cakephp/migrations": "^4.0.0",
         "cakephp/plugin-installer": "^2.0",
         "mobiledetect/mobiledetectlib": "^3.74",
-        "toggenation/gmail-email-send": "dev-bugfix"
+        "toggenation/gmail-email-send": "dev-master"
     },
     "require-dev": {
         "cakephp/bake": "^3.0.0",
