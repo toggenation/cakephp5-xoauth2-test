@@ -2949,12 +2949,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/toggenation/gmail-email-send.git",
-                "reference": "17947d6bb5ef0581e281cade121be56878af75f7"
+                "reference": "768ceca421afd170cb2e16e90cd799da9d758912"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/toggenation/gmail-email-send/zipball/17947d6bb5ef0581e281cade121be56878af75f7",
-                "reference": "17947d6bb5ef0581e281cade121be56878af75f7",
+                "url": "https://api.github.com/repos/toggenation/gmail-email-send/zipball/768ceca421afd170cb2e16e90cd799da9d758912",
+                "reference": "768ceca421afd170cb2e16e90cd799da9d758912",
                 "shasum": ""
             },
             "require": {
@@ -2991,7 +2991,7 @@
                 "source": "https://github.com/toggenation/gmail-email-send/tree/master",
                 "issues": "https://github.com/toggenation/gmail-email-send/issues"
             },
-            "time": "2024-04-01T11:01:57+00:00"
+            "time": "2024-04-01T11:42:53+00:00"
         }
     ],
     "packages-dev": [
