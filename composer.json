@@ -1,9 +1,10 @@
 {
-    "extra": {
-        "google/apiclient-services": [
-            "Gmail"
-        ]
-    },
+    "repositories": [
+        {
+            "type": "vcs",
+            "url": "https://github.com/toggenation/cakephp5-xoauth2"
+        }
+    ],
     "name": "cakephp/app",
     "description": "CakePHP skeleton app",
     "homepage": "https://cakephp.org",
@@ -14,8 +15,8 @@
         "cakephp/cakephp": "^5.0.1",
         "cakephp/migrations": "^4.0.0",
         "cakephp/plugin-installer": "^2.0",
-        "google/apiclient": "^2.15",
-        "mobiledetect/mobiledetectlib": "^3.74"
+        "mobiledetect/mobiledetectlib": "^3.74",
+        "toggenation/gmail-email-send": "dev-bugfix"
     },
     "require-dev": {
         "cakephp/bake": "^3.0.0",
