@@ -341,7 +341,13 @@ return [
      * Configures logging options
      */
     'Log' => [
-
+        'email' => [
+            'className' => FileLog::class,
+            'path' => LOGS,
+            'levels' => [],
+            'scopes' => ['email'],
+            'file' => 'email',
+        ],
         'debug' => [
             'className' => FileLog::class,
             'path' => LOGS,

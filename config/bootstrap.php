@@ -233,10 +233,12 @@ ServerRequest::addDetector('tablet', function ($request) {
 //\Cake\I18n\FrozenTime::setToStringFormat('dd.MM.yyyy HH:mm');
 
 
-Log::setConfig('email', [
-    'className' => FileLog::class,
-    'path' => LOGS,
-    'levels' => [],
-    'scopes' => ['email'],
-    'file' => 'email.log',
-]);
+// Log::setConfig('email', [
+//     'className' => FileLog::class,
+//     'path' => LOGS,
+//     'levels' => [],
+//     'scopes' => ['email'],
+//     'file' => 'email.log',
+// ]);
+
+Log::warning("Hi James", ['scope' => ['email']]);
