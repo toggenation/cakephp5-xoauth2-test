@@ -1,0 +1,3 @@
+[submodule "plugins/gmail-email-send"]
+	path = plugins/gmail-email-send
+	url = git@github.com:toggenation/gmail-email-send.git
